@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block title %}TagBook{% endblock %}
+{% block body %}
+{% if user.username %}
+<div class="container">
+
+    <!-- Search by Tag -->
+    <div class="row">
+        <div class="col input-group input-group-dynamic mt-4 mb-4">
+            <input id="q_l" name="q_l" class="form-control" maxlength="255" value="" placeholder="Search by Tag"
+                   onkeydown="if (event.keyCode == 13) document.getElementById('b').click()">
+            <span class="input-group-text"><i class="material-icons">search</i></span>
+        </div>
+        <div class="col-auto mt-4">
+            <input id="b_l" class="btn bg-gradient-secondary" type="submit" value="Tag">
+        </div>
+    </div>
+
+    <!-- List by year -->
+    <div class="row bg-light">
+        <div class="mt-2">
+            <div class="dropdown">
+              <button class="btn bg-gradient-secondary dropdown-toggle" type="button" id="yearDropdownButton"
+                      data-bs-toggle="dropdown" aria-expanded="false">
+                List by year
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="yearDropdownButton" id="yearDropdownMenu">
+              </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search by Author -->
+    <div class="row">
+        <div class="col input-group input-group-dynamic mt-4 mb-4">
+            <input id="q_a" name="q_a" class="form-control" maxlength="255" value="" placeholder="Search by Author"
+                   onkeydown="if (event.keyCode == 13) document.getElementById('a').click()">
+            <span class="input-group-text"><i class="material-icons">search</i></span>
+        </div>
+        <div class="col-auto mt-4">
+            <input id="b_a" class="btn bg-gradient-secondary" type="submit" value="Author">
+        </div>
+    </div>
+
+    <!-- List by flags -->
+    <div class="row bg-light">
+        <div class="col-5 mt-2">
+            <input id="b_f" class="btn bg-gradient-secondary" type="submit" value="List By flags">
+        </div>
+        <div class="col-3 mt-4" style="width:200px;">
+            <div class="row">
+                <div class="col ms-auto form-check form-switch">
+                    <input class="form-check-input" type="checkbox" name="check1" id="id_check1">
+                </div>
+                <div class="col ms-auto form-check form-switch">
+                    <input class="form-check-input" type="checkbox" name="check2" id="id_check2">
+                </div>
+                <div class="col ms-auto form-check form-switch">
+                    <input class="form-check-input" type="checkbox" name="check3" id="id_check3">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tag cloud -->
+    <div class="row mt-4">
+        <div class="col-1 ml-auto"><span class="text-dark material-icons">tags</span></div>
+        <div class="col tag-cloud">
+{% for tag in tags_with_count %}
+<a class="text-info" style="font-size:{{ tag.font_size }}px;" href="listtag/?tag={{ tag.name }}">{{ tag.name }}</a>
+{% endfor %}
+        </div>
+    </div>
+
+</div>
+<script>
+$(document).ready(function() {
+    // 페이지 로딩이 완료되면 fill_finish_year 함수를 호출합니다.
+    fill_finish_year();
+});
+
+function fill_finish_year() {
+    var $ul = $('#yearDropdownMenu');
+    if ($ul.length == 0)
+        return;
+    $.ajax({
+        url: "/finishyear",
+        dataType: "json",
+        success: function(data) {
+            var finish_years = data.finish_year;
+
+            // 기존에 있던 리스트 아이템을 삭제
+            $ul.empty();
+
+            // 새로운 리스트 아이템 추가
+            finish_years.forEach(function(year) {
+                var $li = $('<li>');
+                var $a = $('<a>', {
+                    'class': 'dropdown-item',
+                    'href': '/listyear?year=' + year,
+                    'text': year
+                });
+                $li.append($a);
+                $ul.append($li);
+            });
+        }
+    });
+}
+
+document.getElementById('b_l').addEventListener('click', function() {
+    window.location.href = '/listtag?tag=' + document.getElementById('q_l').value;
+});
+
+document.getElementById('b_a').addEventListener('click', function() {
+    window.location.href = '/listauthor?author=' + document.getElementById('q_a').value;
+});
+
+document.getElementById('b_f').addEventListener('click', function() {
+    window.location.href = '/listflag?flag1=' + document.getElementById('id_check1').checked
+                        + '&flag2=' + document.getElementById('id_check2').checked
+                        + '&flag3=' + document.getElementById('id_check3').checked;
+});
+
+</script>
+{% endif %}
+{% endblock %}

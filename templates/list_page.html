@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}{{list_title}}{% endblock %}
+{% block body %}
+{% if records %}
+<div>
+{% include "records.html" %}
+</div>
+{% else %}
+<div class="bg-light pt-2 pb-2 px-4">No books</div>
+{% endif %}
+{% endblock %}

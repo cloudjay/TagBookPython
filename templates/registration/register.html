@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Registration{% endblock %}
+{% block body %}
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<div class="container">
+    <form method="post" action=".">
+        <div class="input-group input-group-dynamic mt-4">
+{% if form.username.errors %}
+            <label class="form-label">{{ form.username.errors.as_text }}</label>
+{% else %}
+            <label class="form-label" for="id_username">User name:</label>
+{% endif %}
+            <input class="form-control" name="username" autocapitalize="none" maxlength="150" required id="id_username">
+        </div>
+        <div class="input-group input-group-dynamic mt-4">
+{% if form.password1.errors %}
+            <label class="form-label" for="id_password1">{{ form.password1.errors.as_text }}</label>
+{% else %}
+            <label class="form-label" for="id_password1">Password:</label>
+{% endif %}
+            <input class="form-control" type="password" name="password1" required id="id_password1">
+        </div>
+        <div class="input-group input-group-dynamic mt-4">
+{% if form.password2.errors %}
+            <label class="form-label" for="id_password2">{{ form.password2.errors.as_text }}</label>
+{% else %}
+            <label class="form-label" for="id_password2">Password again:</label>
+{% endif %}
+            <input class="form-control" type="password" name="password2" required id="id_password2">
+        </div>
+        <div class="g-recaptcha mt-4" data-sitekey="6LcUTJEeAAAAAOeeGgDYcWOpbPy7IRa92OFGcwW8"></div>
+        <input type="hidden" name="next" value="/login"/>
+        <input class="btn bg-gradient-secondary mt-4" type="submit" value="Register"/>
+{% if form.non_field_errors.errors %}
+        <div>{{ form.non_field_errors.as_text }}</div>
+{% endif %}
+    </form>
+</div>
+{% endblock %}

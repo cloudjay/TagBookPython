@@ -1,0 +1,128 @@
+<script type="text/javascript" >
+$(document).ready(function() {
+    // 별의 색을 업데이트합니다.
+    function updateStars(value) {
+        $(".star").each(function() {
+            if (parseInt($(this).val()) == 0) {
+                $(this).next().css("color", "grey");
+            }
+            else if (parseInt($(this).val()) <= value) {
+                $(this).next().css("color", "#FFB347");
+            } else {
+                $(this).next().css("color", "grey");
+            }
+        });
+    }
+
+    // 초기 체크된 값에 따라 별의 색을 업데이트합니다.
+    let initialValue = parseInt($('input[name="star1"]:checked').val());
+    updateStars(initialValue);
+
+    // 사용자가 별을 클릭했을 때 별의 색을 업데이트합니다.
+    $(".star").change(function() {
+        let value = parseInt($(this).val());
+        updateStars(value);
+    });
+
+    // 페이지 isbn 인자가 있을 때, scroll down to end
+    let url = new URL(window.location.href);
+    let isbn = url.searchParams.get("isbn");
+    if (isbn) {
+        window.scrollTo(0,document.body.scrollHeight);
+    }
+
+    // Delete 확인 팝업
+    const deleteBtn = document.getElementById('deleteBtn');
+    deleteBtn.addEventListener('click', function(e) {
+        e.preventDefault(); // 기본 이벤트를 막음
+        const isbn = e.currentTarget.getAttribute('data-isbn');
+        const isConfirmed = window.confirm('정말로 이 책을 삭제하시겠습니까?');
+        if (isConfirmed) {
+            window.location.href = `/delete?isbn=${isbn}`;
+        }
+    });
+});
+</script>
+    <form method="post" action=".">
+        <div class="input-group input-group-dynamic mt-4">
+            <input class="form-control" name="title" autocapitalize="none" maxlength="{{books.models.MAX_BOOK_TITLE_LEN}}" required id="id_title" placeholder="Title" value="{{ record.title }}">
+        </div>
+        <div class="input-group input-group-dynamic mt-4">
+            <input class="form-control" name="isbn" autocapitalize="none" maxlength="{{books.models.ISBN_DIGITS}}" id="id_isbn" placeholder="ISBN" value="{{ record.book.isbn }}">
+        </div>
+        <div class="input-group input-group-dynamic mt-4">
+            <input class="form-control" name="author" autocapitalize="none" maxlength="{{books.models.MAX_AUTHOR_LEN}}" id="id_author" placeholder="Author" value="{{ record.author }}">
+        </div>
+        <div class="input-group input-group-dynamic mt-4">
+            <input class="form-control" name="publisher" autocapitalize="none" maxlength="{{books.models.MAX_PUBLISHER_LEN}}" id="id_publisher" placeholder="Publisher" value="{{ record.publisher }}">
+        </div>
+        <div class="input-group input-group-static mt-4">
+            <div class="input-group-prepend"><span class="input-group-text"><i class="material-icons">event</i></span></div>
+            <label for="id_dateStart">Start date</label>
+            <input class="form-control" name="dateStart" id="id_dateStart" data-provide="datepicker" value='{{ record.dateStart|date:"Y-m-d" }}'>
+        </div>
+        <div class="input-group input-group-static mt-4">
+            <div class="input-group-prepend"><span class="input-group-text"><i class="material-icons">event</i></span></div>
+            <label for="id_dateEnd">Finish date</label>
+            <input class="form-control" name="dateEnd" id="id_dateEnd" data-provide="datepicker" value='{{ record.dateEnd|date:"m/d/Y" }}'>
+        </div>
+        <div class="input-group input-group-static mt-4">
+            <textarea name="memo" class="form-control" id="memo" rows="3" placeholder="Memo" >{% if record.memo is not None %}{{ record.memo }}{% endif %}</textarea>
+        </div>
+        <div class="input-group input-group-static mt-4">
+            <label for="id_tags">Tags</label>
+            <input class="form-control" name="tags" autocapitalize="none" id="id_tags" value="{{ tags }}">
+        </div>
+        <div class="input-group input-group-static mt-4">
+            <div class="form-check star-rating">
+                <input class="form-check-input star" type="radio" name="star1" id="star_0" value="0" {% if record.rating == 0 %}checked{% endif %}/>
+                <label class="material-icons" for="star_0">stars</label>
+                <input class="form-check-input star" type="radio" name="star1" id="star_1" value="2" {% if record.rating == 2 %}checked{% endif %}/>
+                <label class="material-icons" for="star_1">star</label>
+                <input class="form-check-input star" type="radio" name="star1" id="star_2" value="4" {% if record.rating == 4 %}checked{% endif %}/>
+                <label class="material-icons" for="star_2">star</label>
+                <input class="form-check-input star" type="radio" name="star1" id="star_3" value="6" {% if record.rating == 6 %}checked{% endif %}/>
+                <label class="material-icons" for="star_3">star</label>
+                <input class="form-check-input star" type="radio" name="star1" id="star_4" value="8" {% if record.rating == 8 %}checked{% endif %}/>
+                <label class="material-icons" for="star_4">star</label>
+                <input class="form-check-input star" type="radio" name="star1" id="star_5" value="10" {% if record.rating == 10 %}checked{% endif %}/>
+                <label class="material-icons" for="star_5">star</label>
+            </div>
+        </div>
+        <div class="input-group input-group-static mt-2">
+            <span class="material-icons" style="margin-right:0.5em;">flag</span>
+            <div class="form-check form-switch">
+                <label class="form-check-label" for="id_check1"></label>
+                <input class="form-check-input" type="checkbox" name="check1" id="id_check1" {% if record.check1 %}checked{% endif %}>
+            </div>
+            <div class="form-check form-switch">
+                <label class="form-check-label" for="id_check2"></label>
+                <input class="form-check-input" type="checkbox" name="check2" id="id_check2" {% if record.check2 %}checked{% endif %}>
+            </div>
+            <div class="form-check form-switch">
+                <label class="form-check-label" for="id_check3"></label>
+                <input class="form-check-input" type="checkbox" name="check3" id="id_check3" {% if record.check3 %}checked{% endif %}>
+            </div>
+        </div>
+
+        <input type="hidden" name="next" value="/"/>
+        <input type="hidden" name="link" id="link" value=""/>
+        <input type="hidden" name="imageLink" id="imageLink" value=""/>
+        <input class="btn bg-gradient-secondary mt-4" type="submit" value="Save"/>
+{% if record is not None and record.book is not None and record.book.isbn is not None %}
+        <a href="#" id="deleteBtn" class="btn btn-danger mt-4" data-isbn="{{ record.book.isbn }}">Delete</a>
+{% endif %}
+    </form>
+
+<script>
+$("#id_dateStart").datepicker({
+    clearBtn: true,
+    autoclose: true,
+});
+$("#id_dateEnd").datepicker({
+    todayHighlight : true,
+    todayBtn: "linked",
+    clearBtn: true,
+    autoclose: true,
+});
+</script>

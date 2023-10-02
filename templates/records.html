@@ -1,0 +1,65 @@
+<script>
+function sortDivsByDate() {
+  const $container = $("#container");
+  const $divs = $container.children("div");
+
+  // data-fdate 속성을 기준으로 정렬
+  const sortedDivs = $divs.sort(function(a, b) {
+    const dateA = $(a).data("fdate");
+    const dateB = $(b).data("fdate");
+    return dateA > dateB ? 1 : dateA < dateB ? -1 : 0;
+  });
+
+  // 정렬된 div들을 다시 container에 삽입
+  $container.empty().append(sortedDivs);
+}
+
+</script>
+<div class="row">
+    <div class="col"></div>
+    <div class="col-auto mt-2">
+        <a href="javascript:sortDivsByDate();" id="sort-button" class="text-info"><span class="material-icons">sort</span>by finish date</a>
+    </div>
+    <div class="col-1"></div>
+</div>
+<div id="container">
+{% for record in records %}
+<div class="card card-frame my-1" data-title="{{record.title}}" data-fdate='{{record.dateEnd|date:"Y-m-d"}}' data-isbn="{{record.book.isbn}}">
+  <div class="card-body">
+  <div class="row">
+      <div class="col-3">
+{% if record.book.imageUrl %}
+          <img src="{{record.book.imageUrl}}" class="img-fluid shadow"/>
+{% endif %}
+{% if user == record.user %}
+          <br/><a href="/edit?isbn={{record.book.isbn}}"><button class="btn btn-outline-secondary mt-1"><i class="material-icons">create</i></button></a>
+{% endif %}
+      </div>
+      <div class="book_contents {% if record.book.imageUrl %}col-9{% endif %}">
+      <p>
+          {% if record.author %}{{record.author}}. {% endif %}<em>{{record.title}}.</em> {% if record.publisher %}{{record.publisher}}. {% endif %}{% if record.book.isbn %}ISBN: <a class="isbnlink" href="{{record.book.url}}">{{record.book.isbn}}</a>{% endif %}<br/>
+          {% if record.dateStart %}{{record.dateStart|date:"Y-m-d"}} {% endif %}{% if record.dateEnd|date:"Y-m-d" %}~ {{record.dateEnd|date:"Y-m-d"}}<br/>{% endif %}
+          {% if record.rating > 0 %}
+            {% for i in ratings %}
+                {% if i <= record.rating %}
+          <span class="material-icons">star</span>
+                {% else %}
+          <span class="material-icons">star_border</span>
+                {% endif %}
+            {% endfor %}
+          <br/>
+          {% endif %}
+          {% for tag in record.tags.all %}
+          <a href="/listtag/?tag={{tag.name}}"><span>{{tag.name}}</span></a>
+          {% endfor %}<br/>
+          {% if record.check1 %}<span class="material-icons" style="color:#FFD1DC;">flag</span>{% endif %}
+          {% if record.check2 %}<span class="material-icons" style="color:#98FF98;">flag</span>{% endif %}
+          {% if record.check3 %}<span class="material-icons" style="color:#AEC6CF;">flag</span>{% endif %}
+          </p>
+      {% if record.memo is not None %}<div>{{record.memo}}</div>{% endif %}
+      </div>
+  </div>
+  </div>
+</div>
+{% endfor %}
+</div>  <!-- container -->

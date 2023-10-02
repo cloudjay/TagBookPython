@@ -1,0 +1,93 @@
+html, body {
+  overflow-x: clip;
+}
+
+.container {
+    padding-right: var(--bs-gutter-x,0.5rem);
+    padding-left: var(--bs-gutter-x,0.5rem);
+}
+
+/* Inputs */
+
+.input-group.input-group-static.is-focused label,
+.input-group.input-group-dynamic.is-focused label {
+    color: #003B6F;
+}
+
+.input-group.input-group-static .form-control,
+.input-group.input-group-static .form-control:focus,
+.input-group.input-group-dynamic .form-control,
+.input-group.input-group-dynamic .form-control:focus {
+    background-image: linear-gradient(0deg,#003B6F 2px,rgba(0,59,111,0) 0),linear-gradient(0deg,#d2d2d2 1px,hsla(0,0%,82%,0) 0);
+}
+
+.datepicker-dropdown {
+    background-color:#f8f9fa;
+}
+
+.book_contents p {
+    font-size: 14px;
+    font-weight: 400;
+}
+
+/* Stars */
+.star {
+  display:none;
+}
+.star-rating {
+  padding-left: 0;
+}
+
+/* Checks */
+.form-check-label {
+  margin-right: 1em;
+}
+.form-switch .form-check-input:checked#id_check1{
+    background-color: #FFD1DC;
+}
+.form-switch .form-check-input:checked#id_check2{
+    background-color: #98FF98;
+}
+.form-switch .form-check-input:checked#id_check3{
+    background-color: #AEC6CF;
+}
+
+/* Material Icons self-hosting */
+
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  /* src: url(/assets/fonts/material/MaterialIcons-Regular.eot);  For IE6-8 */
+  src: local('Material Icons'),
+    local('MaterialIcons-Regular'),
+    /* url(/assets/fonts/material/MaterialIcons-Regular.woff2) format('woff2'), */
+    /* url(/assets/fonts/material/MaterialIcons-Regular.woff) format('woff'), */
+    url(/assets/fonts/material/MaterialIcons-Regular.ttf) format('truetype');
+}
+
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;  /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Support for IE. */
+  font-feature-settings: 'liga';
+}
+

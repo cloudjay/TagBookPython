@@ -1,0 +1,14 @@
+<nav class="navbar navbar-dark bg-gradient-dark sticky-top">
+    <div class="navbar-header">
+        <a href="/" class="text-light"><i class="material-icons align-bottom">home</i></a>
+        <a href="/edit" class="text-light"><i class="material-icons align-bottom">add</i></a>
+    </div>
+    <div class="navbar-right">
+{% if user.is_authenticated %}
+        <a href="/logout" class="text-light"><i class="material-icons align-bottom">logout</i> Logout</a>
+{% else %}
+        <a href="/login" class="text-light"><i class="material-icons align-bottom">login</i> Login</a>
+        <a href="/register" class="text-light"><i class="material-icons align-bottom">app_registration</i> Register</a>
+{% endif %}
+    </div>
+</nav>

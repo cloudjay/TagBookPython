@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Tag a book{% endblock %}
+{% block head %}
+    <script type="text/javascript" src="/assets/js/search.js"></script>
+{% endblock %}
+{% block body %}
+<div class="container">
+    <div>
+        <div class="input-group input-group-dynamic mt-4">
+            <span class="input-group-text"><i class="material-icons">search</i></span>
+            <input id="q" name="q" class="form-control" maxlength="255" value="" placeholder="Search" onkeydown="if (event.keyCode == 13) document.getElementById('b').click()">
+        </div>
+        <input id="b" class="btn bg-gradient-secondary mt-4" type="submit" value="Search">
+    </div>
+    <div id="r" class="search_result"></div>
+    {% include "input_block.html" %}
+</div>
+{% endblock %}

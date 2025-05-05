@@ -1,13 +1,20 @@
 from django.contrib.auth import login
 from django.contrib.auth.views import LogoutView
+from django.contrib.auth.decorators import login_required
 from django.db.models import Count
 from django.db.models import Q
 from django.http import HttpResponse, Http404, HttpResponseRedirect
+from django.shortcuts import render
 from django.template.loader import get_template
 from django.views.decorators.csrf import csrf_exempt
 import json
 from books.forms import *
 from books.models import *
+
+# Import for CSV import_page
+import csv
+import io
+from datetime import datetime
 
 
 def main_page(request):
@@ -28,6 +35,8 @@ def main_page(request):
             if dateOfBook is not None:
                 year_set.add(dateOfBook.year)
 
+        sorted_years = sorted(year_set, reverse=True)
+
         # Tag cloud
         tags_with_count = Tag.objects.filter(bookrecord__user=request.user) \
             .values('name') \
@@ -38,14 +47,14 @@ def main_page(request):
         for tag in tags_with_count:
             # Normalize count to the [10, 20] range for font-size
             if max_count == min_count:
-                font_size = 15
+                font_size = 20
             else:
-                font_size = 10 + (tag['tag_count'] - min_count) * (20 - 10) / (max_count - min_count)
+                font_size = 15 + (tag['tag_count'] - min_count) * (25 - 15) / (max_count - min_count)
             tag['font_size'] = font_size
 
     variables = {
         'user': current_user,
-        'years': year_set,
+        'years': sorted_years,
         'tags_with_count': tags_with_count,
     }
     output = template.render(variables)
@@ -238,6 +247,9 @@ def list_of_year_page(request):
                 user=request.user,
                 dateEnd__year=year
             )
+            for record in records:
+                if record.book and not record.book.imageUrl:
+                    record.book.fetch_image_from_aladin()
             variables = {
                 'ratings': [2, 4, 6, 8, 10],
                 'year': year,
@@ -267,6 +279,9 @@ def list_of_tag_page(request):
                 user=request.user,
                 tags__name=tag
             )
+            for record in records:
+                if record.book and not record.book.imageUrl:
+                    record.book.fetch_image_from_aladin()
             variables = {
                 'ratings': [2, 4, 6, 8, 10],
                 'tag': tag,
@@ -387,3 +402,61 @@ def user_page(_, username):
     }
     output = template.render(variables)
     return HttpResponse(output)
+
+
+@csrf_exempt
+@login_required
+def import_page(request):
+    if request.method == 'POST' and request.FILES.get('csv_file'):
+        csv_file = request.FILES['csv_file']
+        data = csv_file.read().decode('utf-8')
+        io_string = io.StringIO(data)
+        reader = csv.reader(io_string, delimiter=',', quotechar='"')
+
+        for row in reader:
+            if len(row) < 8:
+                continue
+
+            author, title, publisher, isbn, tag_str, date_start_str, date_end_str, memo = row
+
+            book, _ = Book.objects.get_or_create(isbn=isbn)
+
+            date_start = datetime.strptime(date_start_str, "%Y-%m-%d") if date_start_str else None
+            date_end = datetime.strptime(date_end_str, "%Y-%m-%d") if date_end_str else None
+
+            book_record, created = BookRecord.objects.get_or_create(
+                user=request.user,
+                book=book,
+                defaults={
+                    'title': title,
+                    'author': author,
+                    'publisher': publisher,
+                    'memo': memo,
+                    'dateStart': date_start,
+                    'dateEnd': date_end
+                }
+            )
+
+            if not created:
+                book_record.title = title
+                book_record.author = author
+                book_record.publisher = publisher
+                book_record.memo = memo
+                book_record.dateStart = date_start
+                book_record.dateEnd = date_end
+                book_record.save()
+
+            # Handle tags
+            tag_str = tag_str.strip('[]')
+            tag_names = [tag.strip() for tag in tag_str.split(',')] if tag_str else []
+
+            for tag_name in tag_names:
+                if tag_name:
+                    tag, _ = Tag.objects.get_or_create(name=tag_name)
+                    book_record.tags.add(tag)
+
+        return HttpResponseRedirect('/')
+
+    template = get_template('import_page.html')
+    return render(request, 'import_page.html', {'user': request.user})
+

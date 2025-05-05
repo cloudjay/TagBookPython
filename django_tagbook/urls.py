@@ -19,4 +19,5 @@ urlpatterns = [
     path('listauthor/', list_of_author_page),
     path('listflag/', list_by_flags_page),
     path('delete/', delete_page),
+    path('import/', import_page),
 ]

@@ -27,7 +27,7 @@ function sortDivsByDate() {
 <div class="card card-frame my-1" data-title="{{record.title}}" data-fdate='{{record.dateEnd|date:"Y-m-d"}}' data-isbn="{{record.book.isbn}}">
   <div class="card-body">
   <div class="row">
-      <div class="col-3">
+      <div class="col-auto" style="width:120px;">
 {% if record.book.imageUrl %}
           <img src="{{record.book.imageUrl}}" class="img-fluid shadow"/>
 {% endif %}
@@ -35,7 +35,7 @@ function sortDivsByDate() {
           <br/><a href="/edit?isbn={{record.book.isbn}}"><button class="btn btn-outline-secondary mt-1"><i class="material-icons">create</i></button></a>
 {% endif %}
       </div>
-      <div class="book_contents {% if record.book.imageUrl %}col-9{% endif %}">
+      <div class="book_contents col">
       <p>
           {% if record.author %}{{record.author}}. {% endif %}<em>{{record.title}}.</em> {% if record.publisher %}{{record.publisher}}. {% endif %}{% if record.book.isbn %}ISBN: <a class="isbnlink" href="{{record.book.url}}">{{record.book.isbn}}</a>{% endif %}<br/>
           {% if record.dateStart %}{{record.dateStart|date:"Y-m-d"}} {% endif %}{% if record.dateEnd|date:"Y-m-d" %}~ {{record.dateEnd|date:"Y-m-d"}}<br/>{% endif %}

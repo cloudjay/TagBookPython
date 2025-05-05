@@ -88,6 +88,7 @@ function fill_finish_year() {
         dataType: "json",
         success: function(data) {
             var finish_years = data.finish_year;
+            finish_years.sort(function(a, b) { return b - a; });
 
             // 기존에 있던 리스트 아이템을 삭제
             $ul.empty();

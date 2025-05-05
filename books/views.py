@@ -24,6 +24,7 @@ def main_page(request):
     year_set = set()
     tags_with_count = []
     template = get_template('main_page.html')
+    sorted_years = []
 
     if current_user.is_authenticated:
 

@@ -150,7 +150,7 @@ var obj = {
 			success: function(data) {
 			    console.log(data);
 				if (data.checkisbn == true) {
-					window.location = "/save?isbn=" + isbn;
+					window.location = "/edit?isbn=" + isbn;
 				} else {
 					obj.fillinput(i);
 				}				

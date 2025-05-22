@@ -1,40 +1,63 @@
 <script>
+let sortAscending = true;
+
 function sortDivsByDate() {
   const $container = $("#container");
   const $divs = $container.children("div");
 
-  // data-fdate 속성을 기준으로 정렬
   const sortedDivs = $divs.sort(function(a, b) {
-    const dateA = $(a).data("fdate");
-    const dateB = $(b).data("fdate");
-    return dateA > dateB ? 1 : dateA < dateB ? -1 : 0;
+    const dateA = new Date($(a).data("fdate"));
+    const dateB = new Date($(b).data("fdate"));
+
+    return sortAscending ? dateA - dateB : dateB - dateA;
   });
 
-  // 정렬된 div들을 다시 container에 삽입
   $container.empty().append(sortedDivs);
-}
 
+  // 토글 정렬 방향
+  sortAscending = !sortAscending;
+
+  // 버튼 아이콘 및 텍스트 변경
+  const $icon = $("#sort-button .material-icons");
+  const $text = $("#sort-button-text");
+
+  if (sortAscending) {
+    // $icon.text("arrow_upward");
+    $text.text("by finish date ↑");
+  } else {
+    // $icon.text("arrow_downward");
+    $text.text("by finish date ↓");
+  }
+}
 </script>
 <div class="row">
     <div class="col"></div>
     <div class="col-auto mt-2">
-        <a href="javascript:sortDivsByDate();" id="sort-button" class="text-info"><span class="material-icons">sort</span>by finish date</a>
+        <a href="javascript:sortDivsByDate();" id="sort-button" class="text-info">
+            <span class="material-icons">sort</span>
+            <span id="sort-button-text">by finish date ↑</span>
+        </a>
     </div>
-    <div class="col-1"></div>
+    <div class="col-auto" style="width:10px;"></div>
 </div>
 <div id="container">
 {% for record in records %}
 <div class="card card-frame my-1" data-title="{{record.title}}" data-fdate='{{record.dateEnd|date:"Y-m-d"}}' data-isbn="{{record.book.isbn}}">
   <div class="card-body">
   <div class="row">
-      <div class="col-auto" style="width:120px;">
-{% if record.book.imageUrl %}
-          <img src="{{record.book.imageUrl}}" class="img-fluid shadow"/>
-{% endif %}
-{% if user == record.user %}
-          <br/><a href="/edit?isbn={{record.book.isbn}}"><button class="btn btn-outline-secondary mt-1"><i class="material-icons">create</i></button></a>
-{% endif %}
-      </div>
+<div class="col-auto" style="width:110px;">
+  {% if record.book.imageUrl %}
+    <img src="{{record.book.imageUrl}}" class="img-fluid shadow"/>
+  {% endif %}
+  {% if user == record.user %}
+    <br/>
+    <a href="/edit?isbn={{record.book.isbn}}">
+      <button class="btn btn-outline-secondary mt-1 w-100">
+        <i class="material-icons">create</i>
+      </button>
+    </a>
+  {% endif %}
+</div>
       <div class="book_contents col">
       <p>
           {% if record.author %}{{record.author}}. {% endif %}<em>{{record.title}}.</em> {% if record.publisher %}{{record.publisher}}. {% endif %}{% if record.book.isbn %}ISBN: <a class="isbnlink" href="{{record.book.url}}">{{record.book.isbn}}</a>{% endif %}<br/>

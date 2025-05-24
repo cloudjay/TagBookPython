@@ -1,3 +1,5 @@
+{% load markdown_extras %}
+
 <script>
 let sortAscending = true;
 
@@ -79,7 +81,7 @@ function sortDivsByDate() {
           {% if record.check2 %}<span class="material-icons" style="color:#98FF98;">flag</span>{% endif %}
           {% if record.check3 %}<span class="material-icons" style="color:#AEC6CF;">flag</span>{% endif %}
           </p>
-      {% if record.memo is not None %}<div>{{record.memo}}</div>{% endif %}
+	  {% if record.memo is not None %}<div>{{record.memo|markdownify|safe}}</div>{% endif %}
       </div>
   </div>
   </div>

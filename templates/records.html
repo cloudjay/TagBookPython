@@ -24,20 +24,21 @@ function sortDivsByDate() {
   const $text = $("#sort-button-text");
 
   if (sortAscending) {
-    // $icon.text("arrow_upward");
-    $text.text("by finish date ↑");
+    $icon.text("arrow_upward");
+    $text.text("by finish date");
   } else {
-    // $icon.text("arrow_downward");
-    $text.text("by finish date ↓");
+    $icon.text("arrow_downward");
+    $text.text("by finish date");
   }
 }
 </script>
 <div class="row">
     <div class="col"></div>
     <div class="col-auto mt-2">
-        <a href="javascript:sortDivsByDate();" id="sort-button" class="text-info">
-            <span class="material-icons">sort</span>
-            <span id="sort-button-text">by finish date ↑</span>
+        <span class="badge bg-secondary">{{ records|length }} {% if records|length == 1 %}Book{% else %}Books{% endif %}</span>
+        <a href="javascript:sortDivsByDate();" id="sort-button">
+            <span class="material-icons" style="position: relative; top: 5px;">sort</span>
+            <span id="sort-button-text">by finish date</span>
         </a>
     </div>
     <div class="col-auto" style="width:10px;"></div>

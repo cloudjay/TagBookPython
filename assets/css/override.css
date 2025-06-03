@@ -30,6 +30,10 @@ html, body {
     font-weight: 400;
 }
 
+.sort-button {
+    color: #7b809a;
+}
+
 /* Stars */
 .star {
   display:none;

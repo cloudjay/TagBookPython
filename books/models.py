@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator, MinValueValidator
 import requests
 import xml.etree.ElementTree as ET
+import time
 
 MAX_BOOK_TITLE_LEN = 256
 MAX_AUTHOR_LEN = 256
@@ -17,7 +18,16 @@ class Book(models.Model):
     imageUrl = models.URLField(default="")
 
     def fetch_aladin_data(self):
-        """Aladin API에서 이미지 URL과 책 URL을 가져옵니다"""
+        """Aladin API에서 이미지 URL과 책 URL을 가져옵니다. ItemLookUp 실패 시 ItemSearch로 폴백합니다."""
+        # 먼저 ItemLookUp 시도
+        if self._fetch_from_item_lookup():
+            return
+        
+        # ItemLookUp 실패 시 ItemSearch로 폴백
+        self._fetch_from_item_search()
+    
+    def _fetch_from_item_lookup(self):
+        """ItemLookUp API를 사용하여 책 정보를 조회합니다. 성공 시 True 반환."""
         aladin_url = "https://www.aladin.co.kr/ttb/api/ItemLookUp.aspx"
         params = {
             'ttbkey': 'ttbncc17012351008',
@@ -32,7 +42,7 @@ class Book(models.Model):
                 namespace = {'aladin': 'http://www.aladin.co.kr/ttb/apiguide.aspx'}
                 root = ET.fromstring(response.content)
                 
-                # item 요소 찾기
+                # item 요소 찾기 (상품이 존재하는지 확인)
                 item = root.find('.//aladin:item', namespace)
                 if item is not None:
                     # 이미지 URL 처리
@@ -52,8 +62,55 @@ class Book(models.Model):
                             self.url = url
                     
                     self.save()
+                    return True
         except Exception as e:
-            print(f"Aladin API Error for ISBN {self.isbn}: {e}")
+            print(f"Aladin ItemLookUp Error for ISBN {self.isbn}: {e}")
+        
+        return False
+    
+    def _fetch_from_item_search(self):
+        """ItemSearch API를 사용하여 책 정보를 조회합니다 (폴백)."""
+        aladin_url = "https://www.aladin.co.kr/ttb/api/ItemSearch.aspx"
+        params = {
+            'ttbkey': 'ttbncc17012351008',
+            'QueryType': 'Keyword',
+            'SearchTarget': 'Book',
+            'Query': self.isbn,
+            'output': 'xml',
+            'MaxResults': 1,
+        }
+
+        try:
+            response = requests.get(aladin_url, params=params, timeout=5)
+            if response.status_code == 200:
+                namespace = {'aladin': 'http://www.aladin.co.kr/ttb/apiguide.aspx'}
+                root = ET.fromstring(response.content)
+                
+                # item 요소 찾기
+                item = root.find('.//item')
+                if item is not None:
+                    # 이미지 URL 처리
+                    if not self.imageUrl:
+                        cover_element = item.find('cover')
+                        if cover_element is not None and cover_element.text:
+                            self.imageUrl = cover_element.text
+                    
+                    # 책 URL 처리 (item 내의 link)
+                    if not self.url:
+                        link_element = item.find('link')
+                        if link_element is not None and link_element.text:
+                            # URL에서 ttbkey와 start 파라미터 제거 (너무 길어짐)
+                            url = link_element.text
+                            if '&ttbkey=' in url:
+                                url = url.split('&ttbkey=')[0]
+                            self.url = url
+                    
+                    self.save()
+                    return True
+        except Exception as e:
+            print(f"Aladin ItemSearch Error for ISBN {self.isbn}: {e}")
+        
+        return False
 
     def fetch_image_from_aladin(self):
         if self.imageUrl:

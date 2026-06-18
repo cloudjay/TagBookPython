@@ -106,8 +106,8 @@ $(document).ready(function() {
         </div>
 
         <input type="hidden" name="next" value="/"/>
-        <input type="hidden" name="link" id="link" value=""/>
-        <input type="hidden" name="imageLink" id="imageLink" value=""/>
+        <input type="hidden" name="link" id="link" value="{% if form.initial.link %}{{ form.initial.link }}{% elif record.book and record.book.url %}{{ record.book.url }}{% else %}{% endif %}"/>
+        <input type="hidden" name="imageLink" id="imageLink" value="{% if form.initial.imageLink %}{{ form.initial.imageLink }}{% elif record.book and record.book.imageUrl %}{{ record.book.imageUrl }}{% else %}{% endif %}"/>
         <input class="btn bg-gradient-secondary mt-4" type="submit" value="Save"/>
 {% if record is not None and record.book is not None and record.book.isbn is not None %}
         <a href="#" id="deleteBtn" class="btn btn-danger mt-4" data-isbn="{{ record.book.isbn }}">Delete</a>

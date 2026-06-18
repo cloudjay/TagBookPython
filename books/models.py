@@ -16,32 +16,57 @@ class Book(models.Model):
     url = models.URLField(default="")
     imageUrl = models.URLField(default="")
 
-    def fetch_image_from_aladin(self):
-        if self.imageUrl:
-            return self.imageUrl
-
+    def fetch_aladin_data(self):
+        """Aladin API에서 이미지 URL과 책 URL을 가져옵니다"""
         aladin_url = "https://www.aladin.co.kr/ttb/api/ItemLookUp.aspx"
         params = {
-            'ttbkey': 'ttbncc17012351008',  # 실제 TTB키 확인 필요
+            'ttbkey': 'ttbncc17012351008',
             'itemIdType': 'ISBN13',
             'output': 'xml',
             'ItemId': self.isbn,
         }
 
-        response = requests.get(aladin_url, params=params)
-        if response.status_code == 200:
-            try:
-                # XML Namespace 처리 추가
+        try:
+            response = requests.get(aladin_url, params=params, timeout=5)
+            if response.status_code == 200:
                 namespace = {'aladin': 'http://www.aladin.co.kr/ttb/apiguide.aspx'}
                 root = ET.fromstring(response.content)
-                cover_element = root.find('.//aladin:cover', namespace)
-                if cover_element is not None and cover_element.text:
-                    self.imageUrl = cover_element.text
+                
+                # item 요소 찾기
+                item = root.find('.//aladin:item', namespace)
+                if item is not None:
+                    # 이미지 URL 처리
+                    if not self.imageUrl:
+                        cover_element = item.find('aladin:cover', namespace)
+                        if cover_element is not None and cover_element.text:
+                            self.imageUrl = cover_element.text
+                    
+                    # 책 URL 처리 (item 내의 link)
+                    if not self.url:
+                        link_element = item.find('aladin:link', namespace)
+                        if link_element is not None and link_element.text:
+                            # URL에서 ttbkey와 start 파라미터 제거 (너무 길어짐)
+                            url = link_element.text
+                            if '&ttbkey=' in url:
+                                url = url.split('&ttbkey=')[0]
+                            self.url = url
+                    
                     self.save()
-            except ET.ParseError as e:
-                print(f"XML Parsing Error: {e}")  # 디버깅 메시지 출력
+        except Exception as e:
+            print(f"Aladin API Error for ISBN {self.isbn}: {e}")
 
+    def fetch_image_from_aladin(self):
+        if self.imageUrl:
+            return self.imageUrl
+        self.fetch_aladin_data()
         return self.imageUrl
+    
+    def get_book_url(self):
+        """책의 URL을 반환합니다. 없으면 Aladin에서 조회합니다"""
+        if self.url:
+            return self.url
+        self.fetch_aladin_data()
+        return self.url
 
     def __unicode__(self):
         return self.isbn

@@ -63,7 +63,7 @@ function sortDivsByDate() {
 </div>
       <div class="book_contents col">
       <p>
-          {% if record.author %}{{record.author}}. {% endif %}<em>{{record.title}}.</em> {% if record.publisher %}{{record.publisher}}. {% endif %}{% if record.book.isbn %}ISBN: <a class="isbnlink" href="{{record.book.url}}">{{record.book.isbn}}</a>{% endif %}<br/>
+          {% if record.author %}{{record.author}}. {% endif %}<em>{{record.title}}.</em> {% if record.publisher %}{{record.publisher}}. {% endif %}{% if record.book.isbn %}ISBN: <a class="isbnlink" href="{% if record.book.url %}{{record.book.url}}{% else %}https://www.aladin.co.kr/search/wsearch.aspx?SearchTarget=Book&SearchWord={{record.book.isbn}}{% endif %}">{{record.book.isbn}}</a>{% endif %}<br/>
           {% if record.dateStart %}{{record.dateStart|date:"Y-m-d"}} {% endif %}{% if record.dateEnd|date:"Y-m-d" %}~ {{record.dateEnd|date:"Y-m-d"}}<br/>{% endif %}
           {% if record.rating > 0 %}
             {% for i in ratings %}

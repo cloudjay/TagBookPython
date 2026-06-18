@@ -48,7 +48,7 @@ $(document).ready(function() {
             <input class="form-control" name="title" autocapitalize="none" maxlength="{{books.models.MAX_BOOK_TITLE_LEN}}" required id="id_title" placeholder="Title" value="{{ record.title }}">
         </div>
         <div class="input-group input-group-dynamic mt-4">
-            <input class="form-control" name="isbn" autocapitalize="none" maxlength="{{books.models.ISBN_DIGITS}}" id="id_isbn" placeholder="ISBN" value="{{ record.book.isbn }}">
+            <input class="form-control" name="isbn" autocapitalize="none" maxlength="{{books.models.ISBN_DIGITS}}" id="id_isbn" placeholder="ISBN" value="{% if form.initial.isbn %}{{ form.initial.isbn }}{% elif record.book and record.book.isbn %}{{ record.book.isbn }}{% else %}{% endif %}">
         </div>
         <div class="input-group input-group-dynamic mt-4">
             <input class="form-control" name="author" autocapitalize="none" maxlength="{{books.models.MAX_AUTHOR_LEN}}" id="id_author" placeholder="Author" value="{{ record.author }}">

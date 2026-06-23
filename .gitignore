@@ -1,1 +1,3 @@
 /tagbookdb
+__pycache__/
+*.py[cod]

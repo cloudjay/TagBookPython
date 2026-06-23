@@ -1,1 +1,1 @@
-Private Web Service for myself
+Private web service for myself

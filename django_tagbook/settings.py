@@ -23,9 +23,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-4bsw9+0_17fthmy_c_+h2asdl4)u9p5+zl92c9luvhvb9xu2q6'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False 
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['book.jaythesheep.com', 'localhost', 'jaythesheep.com']
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://jaythesheep.com',
+    'https://www.jaythesheep.com',
+    'https://book.jaythesheep.com',
+]
 
 
 # Application definition
@@ -125,6 +131,8 @@ STATIC_URL = '/assets/'
 STATICFILES_DIRS = [
     BASE_DIR / "assets",
 ]
+
+STATIC_ROOT = BASE_DIR / 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

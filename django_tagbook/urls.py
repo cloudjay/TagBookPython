@@ -9,7 +9,7 @@ urlpatterns = [
     path('', main_page),
     path('login/', LoginView.as_view(template_name='registration/login.html')),
     path('logout/', logout_page),
-    path('register/', register_page),
+    #path('register/', register_page),
     path('edit/', edit_page),
     path('user/<str:username>', user_page),
     path('checkisbn/', check_page), # check if user has the record of this book

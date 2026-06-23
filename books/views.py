@@ -191,7 +191,7 @@ def edit_page(request):
                 if record.tags.all() is not None:
                     tags = ' '.join([tag.name for tag in record.tags.all()])
                     form_data['tags'] = tags
-                form = BookSaveForm(form_data)
+                form = BookSaveForm(initial=form_data)
         template = get_template('edit_book.html')
         variables = {
             'user': current_user,

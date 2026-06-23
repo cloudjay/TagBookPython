@@ -133,7 +133,7 @@ def edit_page(request):
             record.publisher = form.cleaned_data['publisher']
             record.dateStart = form.cleaned_data['dateStart']
             record.dateEnd = form.cleaned_data['dateEnd']
-            if form.cleaned_data['star1'] is not '':
+            if form.cleaned_data['star1'] != '':
                 record.rating = form.cleaned_data['star1']
             else:
                 record.rating = 0
@@ -157,14 +157,14 @@ def edit_page(request):
         record = BookRecord()
         tags = ''
         # If isbn is given, fill in the form with the book record
-         if request.GET != {}:
-             book, _ = Book.objects.get_or_create(
-                 isbn=request.GET['isbn']
-             )
-             # 책 정보가 없으면 Aladin에서 가져오기
-             if not book.url or not book.imageUrl:
-                 book.fetch_aladin_data()
-             record, created = BookRecord.objects.get_or_create(
+        if request.GET != {}:
+            book, _ = Book.objects.get_or_create(
+                isbn=request.GET['isbn']
+            )
+            # 책 정보가 없으면 Aladin에서 가져오기
+            if not book.url or not book.imageUrl:
+                book.fetch_aladin_data()
+            record, created = BookRecord.objects.get_or_create(
                 user=request.user,
                 book=book
             )
@@ -257,14 +257,14 @@ def list_of_year_page(request):
         template = get_template('list_page.html')
         year = request.GET.get('year', None)
         if year is not None:
-             records = BookRecord.objects.filter(
+            records = BookRecord.objects.filter(
                 user=request.user,
                 dateEnd__year=year
             )
-             for record in records:
-                 if record.book:
-                     if not record.book.imageUrl or not record.book.url:
-                         record.book.fetch_aladin_data()
+            for record in records:
+                if record.book:
+                    if not record.book.imageUrl or not record.book.url:
+                        record.book.fetch_aladin_data()
             variables = {
                 'ratings': [2, 4, 6, 8, 10],
                 'year': year,
@@ -290,14 +290,14 @@ def list_of_tag_page(request):
         template = get_template('list_page.html')
         tag = request.GET.get('tag', None)
         if tag is not None and tag != '':
-             records = BookRecord.objects.filter(
+            records = BookRecord.objects.filter(
                 user=request.user,
                 tags__name=tag
             )
-             for record in records:
-                 if record.book:
-                     if not record.book.imageUrl or not record.book.url:
-                         record.book.fetch_aladin_data()
+            for record in records:
+                if record.book:
+                    if not record.book.imageUrl or not record.book.url:
+                        record.book.fetch_aladin_data()
             variables = {
                 'ratings': [2, 4, 6, 8, 10],
                 'tag': tag,
